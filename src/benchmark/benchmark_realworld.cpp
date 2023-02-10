@@ -158,6 +158,9 @@ void data_show(vector<IMUST> x_buf, vector<pcl::PointCloud<PointType>::Ptr> &pl_
   pub_pl_func(pl_path, pub_path);
 }
 
+#include <chrono>
+
+
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "benchmark2");
@@ -174,6 +177,9 @@ int main(int argc, char **argv)
   string file_path, balm_trajectory;
   n.param<string>("file_path", file_path, "");
   n.param<string>("trajectory_output_path", balm_trajectory, "");
+  
+  using namespace std::chrono;
+  auto start_load = high_resolution_clock::now();
   read_file(x_buf, pl_fulls, file_path);
 
   IMUST es0 = x_buf[0];
@@ -186,6 +192,11 @@ int main(int argc, char **argv)
   win_size = x_buf.size();
   printf("The size of poses: %d\n", win_size);
 
+  auto end_load = high_resolution_clock::now();
+  auto duration_load = duration_cast<milliseconds>(end_load - start_load);
+  std::cout << "load duration: " << duration_load.count() << " [ ms ] " << std::endl;
+  
+  auto start_opt = high_resolution_clock::now();
   pcl::PointCloud<PointType> pl_full, pl_surf, pl_path, pl_send;
   for (int iterCount = 0; iterCount < 1; iterCount++)
   {
@@ -205,11 +216,11 @@ int main(int argc, char **argv)
 
     data_show(x_buf, pl_fulls);
     printf("Initial point cloud is published.\n");
-    printf("Input '1' to start optimization...\n");
-    int a;
-    cin >> a;
-    if (a == 0)
-      exit(0);
+    // printf("Input '1' to start optimization...\n");
+    // int a;
+    // cin >> a;
+    // if (a == 0)
+    //   exit(0);
 
     BALM2 opt_lsv;
     opt_lsv.damping_iter(x_buf, voxhess);
@@ -228,8 +239,14 @@ int main(int argc, char **argv)
   data_show(x_buf, pl_fulls);
   printf("Refined point cloud is published.\n");
 
+  auto end_opt = high_resolution_clock::now();
+  auto duration_opt = duration_cast<milliseconds>(end_opt - start_opt);
+  std::cout << "total duration: " << duration_opt.count() << " [ ms ] " << std::endl;
+
   // dump output to txt file
   ofstream os(balm_trajectory);
+  os << fixed << setprecision(12);
+  os << "# duration [ms] | load: " << duration_load.count() << " | opt: " << duration_opt.count() << std::endl; 
   os << fixed << setprecision(6);
   for (uint i = 0; i < x_buf.size(); i++)
   {

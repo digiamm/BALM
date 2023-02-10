@@ -2,10 +2,10 @@
 	<arg name="rviz" default="true" />
 
 	<param name="voxel_size" type="double" value="1" />
-	<!-- <param name="file_path" type="string" value="/tmp/quadeasy_pcl/quadeasy_trajectory.txt" /> -->
-	<param name="file_path" type="string" value="/tmp/cloister_pcl/cloister_trajectory.txt" />
+	<param name="file_path" type="string" value="/mnt/sda1/mdslam/experiments/suma/suma_stairs/cloud_bins/stairs_trajectory.txt" />
 
-	<param name="trajectory_output_path" type="string" value="/tmp/cloister_pcl/balm_trajectory.txt" />
+	<param name="trajectory_output_path" type="string" value="/home/ldg/Desktop/balm_stairs_suma_estimate.txt" />
+	<!-- <param name="trajectory_output_path" type="string" value="/mnt/sda1/mdslam/experiments/suma/suma_cloister/cloister_balm_trajectory.txt" /> -->
 	<node pkg="balm2" type="benchmark_realworld" name="benchmark_realworld" output="screen" />
 
 	<group if="$(arg rviz)">
